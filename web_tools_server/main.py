@@ -1,7 +1,6 @@
-"""Pizzaz demo MCP server implemented with the Python FastMCP helper.
-
-The server mirrors the Node example in this repository and exposes
-widget-backed tools that render the Pizzaz UI bundle. Each handler returns the
+"""
+Built off of https://github.com/openai/openai-apps-sdk-examples
+Each handler returns the
 HTML shell via an MCP resource and echoes the selected topping as structured
 content so the ChatGPT client can hydrate the widget. The module also wires the
 handlers into an HTTP/SSE stack so you can run the server with uvicorn on port
@@ -43,7 +42,9 @@ class DisplayPicsInput(BaseModel):
 
 # Make into more unique name
 class ImageEditorInput(BaseModel):
-    tailwind_classnames: List[str] = Field(..., alias="tailwindClassnames", description="Tailwind CSS classnames to edit the picture")
+    tailwind_classnames: List[str] = Field(..., alias="tailwindClassnames", description="Tailwind CSS classnames that will be used to modify the image.")
+
+    picture_url: str = Field(..., alias="pictureUrl", description="The URL of the uploaded or referenced picture.")
 
     model_config = ConfigDict(title="ImageEditorInput", 
         description="Use this when the user asks to edit an image", populate_by_name=True, extra="forbid")
@@ -66,52 +67,7 @@ widgets: List[WebWidget] = [
         invoked="Displayed images",
         response_text="Displaying pictures!",
         tool_input_schema=DisplayPicsInput
-    ),
-    # WebWidget(
-    #     identifier="pizza-albums",
-    #     title="Show Pizza Album",
-    #     template_uri="ui://widget/pizza-albums.html",
-    #     invoking="Hand-tossing an album",
-    #     invoked="Served a fresh album",
-    #     html=(
-    #         "<div id=\"pizzaz-albums-root\"></div>\n"
-    #         "<link rel=\"stylesheet\" href=\"https://persistent.oaistatic.com/"
-    #         "ecosystem-built-assets/pizzaz-albums-0038.css\">\n"
-    #         "<script type=\"module\" src=\"https://persistent.oaistatic.com/"
-    #         "ecosystem-built-assets/pizzaz-albums-0038.js\"></script>"
-    #     ),
-    #     response_text="Rendered a pizza album!",
-    # ),
-    # WebWidget(
-    #     identifier="pizza-list",
-    #     title="Show Pizza List",
-    #     template_uri="ui://widget/pizza-list.html",
-    #     invoking="Hand-tossing a list",
-    #     invoked="Served a fresh list",
-    #     html=(
-    #         "<div id=\"pizzaz-list-root\"></div>\n"
-    #         "<link rel=\"stylesheet\" href=\"https://persistent.oaistatic.com/"
-    #         "ecosystem-built-assets/pizzaz-list-0038.css\">\n"
-    #         "<script type=\"module\" src=\"https://persistent.oaistatic.com/"
-    #         "ecosystem-built-assets/pizzaz-list-0038.js\"></script>"
-    #     ),
-    #     response_text="Rendered a pizza list!",
-    # ),
-    # WebWidget(
-    #     identifier="pizza-video",
-    #     title="Show Pizza Video",
-    #     template_uri="ui://widget/pizza-video.html",
-    #     invoking="Hand-tossing a video",
-    #     invoked="Served a fresh video",
-    #     html=(
-    #         "<div id=\"pizzaz-video-root\"></div>\n"
-    #         "<link rel=\"stylesheet\" href=\"https://persistent.oaistatic.com/"
-    #         "ecosystem-built-assets/pizzaz-video-0038.css\">\n"
-    #         "<script type=\"module\" src=\"https://persistent.oaistatic.com/"
-    #         "ecosystem-built-assets/pizzaz-video-0038.js\"></script>"
-    #     ),
-    #     response_text="Rendered a pizza video!",
-    # ),
+    )
 ]
 
 
