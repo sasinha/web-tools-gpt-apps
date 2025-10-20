@@ -16,141 +16,148 @@ from typing import Any, Dict, List
 import mcp.types as types
 from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
-
+import glob
+ASSET_PATH = "../assets"
 
 @dataclass(frozen=True)
-class PizzazWidget:
+class WebWidget:
     identifier: str
     title: str
     template_uri: str
     invoking: str
     invoked: str
-    html: str
     response_text: str
+    tool_input_schema: BaseModel
 
+    def __post_init__(self):        
+        file_base = ASSET_PATH + f"/{self.identifier}-*"
+        html_file_path = glob.glob(file_base + ".html")[0]
+        with open(html_file_path) as htmlfs:
+            object.__setattr__(self, "html", htmlfs.read())
 
-widgets: List[PizzazWidget] = [
-    PizzazWidget(
-        identifier="pizza-map",
-        title="Show Pizza Map",
-        template_uri="ui://widget/pizza-map.html",
-        invoking="Hand-tossing a map",
-        invoked="Served a fresh map",
-        html=(
-            "<div id=\"pizzaz-root\"></div>\n"
-            "<link rel=\"stylesheet\" href=\"https://persistent.oaistatic.com/"
-            "ecosystem-built-assets/pizzaz-0038.css\">\n"
-            "<script type=\"module\" src=\"https://persistent.oaistatic.com/"
-            "ecosystem-built-assets/pizzaz-0038.js\"></script>"
-        ),
-        response_text="Rendered a pizza map!",
+class DisplayPicsInput(BaseModel):
+    image_urls: List[str] = Field(..., alias="imageUrls", description="Image urls for the 'src' tag in <img ... />")
+
+    model_config = ConfigDict(title="DisplayPicsInput", 
+        description= "Use this when displaying images to the user", populate_by_name=True, extra="forbid")
+
+# Make into more unique name
+class ImageEditorInput(BaseModel):
+    tailwind_classnames: List[str] = Field(..., alias="tailwindClassnames", description="Tailwind CSS classnames to edit the picture")
+
+    model_config = ConfigDict(title="ImageEditorInput", 
+        description="Use this when the user asks to edit an image", populate_by_name=True, extra="forbid")
+
+widgets: List[WebWidget] = [
+    WebWidget(
+        identifier="image-editor",
+        title="Edit Image",
+        template_uri="ui://widget/image-editor.html",
+        invoking="Loading image editor",
+        invoked="Loaded image editor",
+        response_text="Editing Image",
+        tool_input_schema=ImageEditorInput
     ),
-    PizzazWidget(
-        identifier="pizza-carousel",
-        title="Show Pizza Carousel",
-        template_uri="ui://widget/pizza-carousel.html",
-        invoking="Carousel some spots",
-        invoked="Served a fresh carousel",
-        html=(
-            "<div id=\"pizzaz-carousel-root\"></div>\n"
-            "<link rel=\"stylesheet\" href=\"https://persistent.oaistatic.com/"
-            "ecosystem-built-assets/pizzaz-carousel-0038.css\">\n"
-            "<script type=\"module\" src=\"https://persistent.oaistatic.com/"
-            "ecosystem-built-assets/pizzaz-carousel-0038.js\"></script>"
-        ),
-        response_text="Rendered a pizza carousel!",
+    WebWidget(
+        identifier="display-pics",
+        title="Display images",
+        template_uri="ui://widget/display-pics.html",
+        invoking="Loading images",
+        invoked="Displayed images",
+        response_text="Displaying pictures!",
+        tool_input_schema=DisplayPicsInput
     ),
-    PizzazWidget(
-        identifier="pizza-albums",
-        title="Show Pizza Album",
-        template_uri="ui://widget/pizza-albums.html",
-        invoking="Hand-tossing an album",
-        invoked="Served a fresh album",
-        html=(
-            "<div id=\"pizzaz-albums-root\"></div>\n"
-            "<link rel=\"stylesheet\" href=\"https://persistent.oaistatic.com/"
-            "ecosystem-built-assets/pizzaz-albums-0038.css\">\n"
-            "<script type=\"module\" src=\"https://persistent.oaistatic.com/"
-            "ecosystem-built-assets/pizzaz-albums-0038.js\"></script>"
-        ),
-        response_text="Rendered a pizza album!",
-    ),
-    PizzazWidget(
-        identifier="pizza-list",
-        title="Show Pizza List",
-        template_uri="ui://widget/pizza-list.html",
-        invoking="Hand-tossing a list",
-        invoked="Served a fresh list",
-        html=(
-            "<div id=\"pizzaz-list-root\"></div>\n"
-            "<link rel=\"stylesheet\" href=\"https://persistent.oaistatic.com/"
-            "ecosystem-built-assets/pizzaz-list-0038.css\">\n"
-            "<script type=\"module\" src=\"https://persistent.oaistatic.com/"
-            "ecosystem-built-assets/pizzaz-list-0038.js\"></script>"
-        ),
-        response_text="Rendered a pizza list!",
-    ),
-    PizzazWidget(
-        identifier="pizza-video",
-        title="Show Pizza Video",
-        template_uri="ui://widget/pizza-video.html",
-        invoking="Hand-tossing a video",
-        invoked="Served a fresh video",
-        html=(
-            "<div id=\"pizzaz-video-root\"></div>\n"
-            "<link rel=\"stylesheet\" href=\"https://persistent.oaistatic.com/"
-            "ecosystem-built-assets/pizzaz-video-0038.css\">\n"
-            "<script type=\"module\" src=\"https://persistent.oaistatic.com/"
-            "ecosystem-built-assets/pizzaz-video-0038.js\"></script>"
-        ),
-        response_text="Rendered a pizza video!",
-    ),
+    # WebWidget(
+    #     identifier="pizza-albums",
+    #     title="Show Pizza Album",
+    #     template_uri="ui://widget/pizza-albums.html",
+    #     invoking="Hand-tossing an album",
+    #     invoked="Served a fresh album",
+    #     html=(
+    #         "<div id=\"pizzaz-albums-root\"></div>\n"
+    #         "<link rel=\"stylesheet\" href=\"https://persistent.oaistatic.com/"
+    #         "ecosystem-built-assets/pizzaz-albums-0038.css\">\n"
+    #         "<script type=\"module\" src=\"https://persistent.oaistatic.com/"
+    #         "ecosystem-built-assets/pizzaz-albums-0038.js\"></script>"
+    #     ),
+    #     response_text="Rendered a pizza album!",
+    # ),
+    # WebWidget(
+    #     identifier="pizza-list",
+    #     title="Show Pizza List",
+    #     template_uri="ui://widget/pizza-list.html",
+    #     invoking="Hand-tossing a list",
+    #     invoked="Served a fresh list",
+    #     html=(
+    #         "<div id=\"pizzaz-list-root\"></div>\n"
+    #         "<link rel=\"stylesheet\" href=\"https://persistent.oaistatic.com/"
+    #         "ecosystem-built-assets/pizzaz-list-0038.css\">\n"
+    #         "<script type=\"module\" src=\"https://persistent.oaistatic.com/"
+    #         "ecosystem-built-assets/pizzaz-list-0038.js\"></script>"
+    #     ),
+    #     response_text="Rendered a pizza list!",
+    # ),
+    # WebWidget(
+    #     identifier="pizza-video",
+    #     title="Show Pizza Video",
+    #     template_uri="ui://widget/pizza-video.html",
+    #     invoking="Hand-tossing a video",
+    #     invoked="Served a fresh video",
+    #     html=(
+    #         "<div id=\"pizzaz-video-root\"></div>\n"
+    #         "<link rel=\"stylesheet\" href=\"https://persistent.oaistatic.com/"
+    #         "ecosystem-built-assets/pizzaz-video-0038.css\">\n"
+    #         "<script type=\"module\" src=\"https://persistent.oaistatic.com/"
+    #         "ecosystem-built-assets/pizzaz-video-0038.js\"></script>"
+    #     ),
+    #     response_text="Rendered a pizza video!",
+    # ),
 ]
 
 
 MIME_TYPE = "text/html+skybridge"
 
 
-WIDGETS_BY_ID: Dict[str, PizzazWidget] = {widget.identifier: widget for widget in widgets}
-WIDGETS_BY_URI: Dict[str, PizzazWidget] = {widget.template_uri: widget for widget in widgets}
+WIDGETS_BY_ID: Dict[str, WebWidget] = {widget.identifier: widget for widget in widgets}
+WIDGETS_BY_URI: Dict[str, WebWidget] = {widget.template_uri: widget for widget in widgets}
 
 
-class PizzaInput(BaseModel):
-    """Schema for pizza tools."""
+# class WebInput(BaseModel):
+#     """Schema for web tools."""
 
-    pizza_topping: str = Field(
-        ...,
-        alias="pizzaTopping",
-        description="Topping to mention when rendering the widget.",
-    )
+#     pizza_topping: str = Field(
+#         ...,
+#         alias="pizzaTopping",
+#         description="Topping to mention when rendering the widget.",
+#     )
 
-    model_config = ConfigDict(populate_by_name=True, extra="forbid")
+#     model_config = ConfigDict(populate_by_name=True, extra="forbid")
 
 
 mcp = FastMCP(
-    name="pizzaz-python",
+    name="webtools-python",
     stateless_http=True,
 )
 
 
-TOOL_INPUT_SCHEMA: Dict[str, Any] = {
-    "type": "object",
-    "properties": {
-        "pizzaTopping": {
-            "type": "string",
-            "description": "Topping to mention when rendering the widget.",
-        }
-    },
-    "required": ["pizzaTopping"],
-    "additionalProperties": False,
-}
+# TOOL_INPUT_SCHEMA: Dict[str, Any] = {
+#     "type": "object",
+#     "properties": {
+#         "pizzaTopping": {
+#             "type": "string",
+#             "description": "Topping to mention when rendering the widget.",
+#         }
+#     },
+#     "required": ["pizzaTopping"],
+#     "additionalProperties": False,
+# }
 
 
-def _resource_description(widget: PizzazWidget) -> str:
+def _resource_description(widget: WebWidget) -> str:
     return f"{widget.title} widget markup"
 
 
-def _tool_meta(widget: PizzazWidget) -> Dict[str, Any]:
+def _tool_meta(widget: WebWidget) -> Dict[str, Any]:
     return {
         "openai/outputTemplate": widget.template_uri,
         "openai/toolInvocation/invoking": widget.invoking,
@@ -165,7 +172,7 @@ def _tool_meta(widget: PizzazWidget) -> Dict[str, Any]:
     }
 
 
-def _embedded_widget_resource(widget: PizzazWidget) -> types.EmbeddedResource:
+def _embedded_widget_resource(widget: WebWidget) -> types.EmbeddedResource:
     return types.EmbeddedResource(
         type="resource",
         resource=types.TextResourceContents(
@@ -184,7 +191,7 @@ async def _list_tools() -> List[types.Tool]:
             name=widget.identifier,
             title=widget.title,
             description=widget.title,
-            inputSchema=deepcopy(TOOL_INPUT_SCHEMA),
+            inputSchema=widget.tool_input_schema.model_json_schema(),
             _meta=_tool_meta(widget),
         )
         for widget in widgets
@@ -260,8 +267,9 @@ async def _call_tool_request(req: types.CallToolRequest) -> types.ServerResult:
 
     arguments = req.params.arguments or {}
     try:
-        payload = PizzaInput.model_validate(arguments)
+        payload = widget.tool_input_schema.model_validate(arguments)
     except ValidationError as exc:
+        print("Validation Error: ", exc.errors())
         return types.ServerResult(
             types.CallToolResult(
                 content=[
@@ -274,7 +282,6 @@ async def _call_tool_request(req: types.CallToolRequest) -> types.ServerResult:
             )
         )
 
-    topping = payload.pizza_topping
     widget_resource = _embedded_widget_resource(widget)
     meta: Dict[str, Any] = {
         "openai.com/widget": widget_resource.model_dump(mode="json"),
@@ -293,7 +300,7 @@ async def _call_tool_request(req: types.CallToolRequest) -> types.ServerResult:
                     text=widget.response_text,
                 )
             ],
-            structuredContent={"pizzaTopping": topping},
+            structuredContent=payload.dict(),
             _meta=meta,
         )
     )
