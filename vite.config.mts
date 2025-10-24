@@ -73,6 +73,7 @@ function multiEntryDevEndpoints(options: {
 <head>
   <script type="module" src="/${name}.js"></script>
   <link rel="stylesheet" href="/${name}.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   </head>
 <body>
   <div id="${name}-root"></div>
