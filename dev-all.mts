@@ -1,5 +1,8 @@
 #!/usr/bin/env -S node --enable-source-maps
-import { createServer as createHttpServer, request as httpRequest } from "node:http";
+import {
+  createServer as createHttpServer,
+  request as httpRequest,
+} from "node:http";
 import { URL } from "node:url";
 import { spawn } from "node:child_process";
 import fg from "fast-glob";
@@ -64,7 +67,10 @@ async function main() {
       return;
     }
 
-    const targetUrl = new URL(urlObj.pathname + urlObj.search, `http://localhost:${REACT_PORT}`);
+    const targetUrl = new URL(
+      urlObj.pathname + urlObj.search,
+      `http://localhost:${REACT_PORT}`
+    );
     const opts = {
       method: req.method,
       headers: {
@@ -115,4 +121,3 @@ main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
-

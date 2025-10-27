@@ -14,10 +14,7 @@ const PER_ENTRY_CSS_GLOB = "**/*.{css,pcss,scss,sass}";
 const PER_ENTRY_CSS_IGNORE = "**/*.module.*".split(",").map((s) => s.trim());
 const GLOBAL_CSS_LIST = [path.resolve("src/index.css")];
 
-const targets: string[] = [
-  "display-pics",
-  "image-editor"
-];
+const targets: string[] = ["display-pics", "image-editor", "my-trivia"];
 const builtNames: string[] = [];
 
 function wrapEntryPlugin(
@@ -180,7 +177,7 @@ for (const name of builtNames) {
   const html = [
     "<!doctype html>",
     "<html>",
-    `<head>${cssBlock}</head>`,
+    `<head><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">${cssBlock}</head>`,
     "<body>",
     `  <div id="${name}-root"></div>${jsBlock}`,
     "</body>",

@@ -17,6 +17,7 @@ from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 import glob
 ASSET_PATH = "../assets"
+import hashlib
 
 @dataclass(frozen=True)
 class WebWidget:
@@ -32,13 +33,26 @@ class WebWidget:
         file_base = ASSET_PATH + f"/{self.identifier}-*"
         html_file_path = glob.glob(file_base + ".html")[0]
         with open(html_file_path) as htmlfs:
-            object.__setattr__(self, "html", htmlfs.read())
+            html = htmlfs.read()
+            object.__setattr__(self, "html", html)
+            html_hash = hashlib.sha256(html.encode()).hexdigest()[:4]
+            object.__setattr__(self, "template_uri", f"{self.template_uri}-{html_hash}.html")
 
 class DisplayPicsInput(BaseModel):
     image_urls: List[str] = Field(..., alias="imageUrls", description="Image urls for the 'src' tag in <img ... />")
 
     model_config = ConfigDict(title="DisplayPicsInput", 
         description= "Use this when displaying images to the user", populate_by_name=True, extra="forbid")
+
+class MyTriviaInput(BaseModel):
+    class Flashcard(BaseModel):
+        question: str = Field(..., alias='question', description='Question for the front of the flashcard')
+        answer: str = Field(..., alias='answer', description='Answer shown on the back of the flashcard once flipped')
+    
+    flashcards: List[Flashcard] = Field(..., alias='flashcards', description='List of Flascard objects')
+
+    model_config = ConfigDict(title="MyTriviaInput", 
+        description= "Use this when populating educational materials to the user", populate_by_name=True, extra="forbid")
 
 # Make into more unique name
 class ImageEditorInput(BaseModel):
@@ -50,23 +64,32 @@ class ImageEditorInput(BaseModel):
         description="Use this when the user asks to edit an image", populate_by_name=True, extra="forbid")
 
 widgets: List[WebWidget] = [
+    # WebWidget(
+    #     identifier="image-editor",
+    #     title="Edit Image",
+    #     template_uri="ui://widget/image-editor.html",
+    #     invoking="Loading image editor",
+    #     invoked="Loaded image editor",
+    #     response_text="Editing Image",
+    #     tool_input_schema=ImageEditorInput
+    # ),
+    # WebWidget(
+    #     identifier="display-pics",
+    #     title="Display images",
+    #     template_uri="ui://widget/display-pics.html",
+    #     invoking="Loading images",
+    #     invoked="Displayed images",
+    #     response_text="Displaying pictures!",
+    #     tool_input_schema=DisplayPicsInput
+    # ),
     WebWidget(
-        identifier="image-editor",
-        title="Edit Image",
-        template_uri="ui://widget/image-editor.html",
-        invoking="Loading image editor",
-        invoked="Loaded image editor",
-        response_text="Editing Image",
-        tool_input_schema=ImageEditorInput
-    ),
-    WebWidget(
-        identifier="display-pics",
-        title="Display images",
-        template_uri="ui://widget/display-pics.html",
-        invoking="Loading images",
-        invoked="Displayed images",
-        response_text="Displaying pictures!",
-        tool_input_schema=DisplayPicsInput
+        identifier="my-trivia",
+        title="My Trivia",
+        template_uri="ui://widget/my-trivia",
+        invoking="Creating educational materials!",
+        invoked="Materials created!",
+        response_text="Showing materials!",
+        tool_input_schema=MyTriviaInput
     )
 ]
 

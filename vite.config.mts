@@ -73,6 +73,12 @@ function multiEntryDevEndpoints(options: {
 <head>
   <script type="module" src="/${name}.js"></script>
   <link rel="stylesheet" href="/${name}.css">
+  <style>
+      :root {
+        overscroll-behavior: none;
+      }
+  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   </head>
 <body>
   <div id="${name}-root"></div>
@@ -212,6 +218,7 @@ export default defineConfig(({}) => ({
     port: 4444,
     strictPort: true,
     cors: true,
+    host: "0.0.0.0",
   },
   esbuild: {
     jsx: "automatic",
