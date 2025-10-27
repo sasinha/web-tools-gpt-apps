@@ -17,6 +17,7 @@ from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 import glob
 ASSET_PATH = "../assets"
+import hashlib
 
 @dataclass(frozen=True)
 class WebWidget:
@@ -32,7 +33,10 @@ class WebWidget:
         file_base = ASSET_PATH + f"/{self.identifier}-*"
         html_file_path = glob.glob(file_base + ".html")[0]
         with open(html_file_path) as htmlfs:
-            object.__setattr__(self, "html", htmlfs.read())
+            html = htmlfs.read()
+            object.__setattr__(self, "html", html)
+            html_hash = hashlib.sha256(html.encode()).hexdigest()[:4]
+            object.__setattr__(self, "template_uri", f"{self.template_uri}-{html_hash}.html")
 
 class DisplayPicsInput(BaseModel):
     image_urls: List[str] = Field(..., alias="imageUrls", description="Image urls for the 'src' tag in <img ... />")
@@ -81,7 +85,7 @@ widgets: List[WebWidget] = [
     WebWidget(
         identifier="my-trivia",
         title="My Trivia",
-        template_uri="ui://widget/my-trivia.html",
+        template_uri="ui://widget/my-trivia",
         invoking="Creating educational materials!",
         invoked="Materials created!",
         response_text="Showing materials!",

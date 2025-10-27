@@ -27,12 +27,13 @@ function InnerApp() {
     //     ],
     // });
     const { flashcards } = useWidgetProps({});
-    if (!flashcards) {
-        <div>Loading...</div>;
-    }
     return (
         <div className={classNames(theme.bg_bg, 'w-screen', 'h-screen')}>
-            <FlashcardViewer flashcards={flashcards} title="MyTrivia Woaoh" />
+            {flashcards === undefined ? (
+                <div className="bg-stone-200 h-full">Loading...</div>
+            ) : (
+                <FlashcardViewer flashcards={flashcards} title="MyTrivia Woaoh" />
+            )}
         </div>
     );
 }
