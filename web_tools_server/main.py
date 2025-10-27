@@ -40,6 +40,16 @@ class DisplayPicsInput(BaseModel):
     model_config = ConfigDict(title="DisplayPicsInput", 
         description= "Use this when displaying images to the user", populate_by_name=True, extra="forbid")
 
+class MyTriviaInput(BaseModel):
+    class Flashcard(BaseModel):
+        question: str = Field(..., alias='question', description='Question for the front of the flashcard')
+        answer: str = Field(..., alias='answer', description='Answer shown on the back of the flashcard once flipped')
+    
+    flashcards: List[Flashcard] = Field(..., alias='flashcards', description='List of Flascard objects')
+
+    model_config = ConfigDict(title="MyTriviaInput", 
+        description= "Use this when populating educational materials to the user", populate_by_name=True, extra="forbid")
+
 # Make into more unique name
 class ImageEditorInput(BaseModel):
     tailwind_classnames: List[str] = Field(..., alias="tailwindClassnames", description="Tailwind CSS classnames that will be used to modify the image.")
@@ -50,23 +60,32 @@ class ImageEditorInput(BaseModel):
         description="Use this when the user asks to edit an image", populate_by_name=True, extra="forbid")
 
 widgets: List[WebWidget] = [
+    # WebWidget(
+    #     identifier="image-editor",
+    #     title="Edit Image",
+    #     template_uri="ui://widget/image-editor.html",
+    #     invoking="Loading image editor",
+    #     invoked="Loaded image editor",
+    #     response_text="Editing Image",
+    #     tool_input_schema=ImageEditorInput
+    # ),
+    # WebWidget(
+    #     identifier="display-pics",
+    #     title="Display images",
+    #     template_uri="ui://widget/display-pics.html",
+    #     invoking="Loading images",
+    #     invoked="Displayed images",
+    #     response_text="Displaying pictures!",
+    #     tool_input_schema=DisplayPicsInput
+    # ),
     WebWidget(
-        identifier="image-editor",
-        title="Edit Image",
-        template_uri="ui://widget/image-editor.html",
-        invoking="Loading image editor",
-        invoked="Loaded image editor",
-        response_text="Editing Image",
-        tool_input_schema=ImageEditorInput
-    ),
-    WebWidget(
-        identifier="display-pics",
-        title="Display images",
-        template_uri="ui://widget/display-pics.html",
-        invoking="Loading images",
-        invoked="Displayed images",
-        response_text="Displaying pictures!",
-        tool_input_schema=DisplayPicsInput
+        identifier="my-trivia",
+        title="My Trivia",
+        template_uri="ui://widget/my-trivia.html",
+        invoking="Creating educational materials!",
+        invoked="Materials created!",
+        response_text="Showing materials!",
+        tool_input_schema=MyTriviaInput
     )
 ]
 

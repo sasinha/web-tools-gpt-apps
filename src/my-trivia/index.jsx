@@ -14,21 +14,25 @@ function App() {
 
 function InnerApp() {
     const theme = useContext(ThemeContext);
-    const { flashcards } = useWidgetProps({
-        flashcards: [
-            {
-                question: 'What is the China Basin in SF?',
-                answer: `China Basin in San Francisco is a waterfront neighborhood that blends a historic industrial past with a modern hub for technology, life sciences, and entertainment`,
-            },
-            {
-                question: "Who did the 'cream of the crop speech' in WWE?",
-                answer: 'Randy Savage',
-            },
-        ],
-    });
+    // const { flashcards } = useWidgetProps({
+    //     flashcards: [
+    //         {
+    //             question: 'What is the China Basin in SF?',
+    //             answer: `China Basin in San Francisco is a waterfront neighborhood that blends a historic industrial past with a modern hub for technology, life sciences, and entertainment`,
+    //         },
+    //         {
+    //             question: "Who did the 'cream of the crop speech' in WWE?",
+    //             answer: 'Randy Savage',
+    //         },
+    //     ],
+    // });
+    const { flashcards } = useWidgetProps({});
+    if (!flashcards) {
+        <div>Loading...</div>;
+    }
     return (
         <div className={classNames(theme.bg_bg, 'w-screen', 'h-screen')}>
-            <FlashcardViewer flashcards={flashcards} title="MyTrivia" />
+            <FlashcardViewer flashcards={flashcards} title="MyTrivia Woaoh" />
         </div>
     );
 }
