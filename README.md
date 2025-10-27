@@ -1,3 +1,10 @@
+# Demo
+
+## Flashcards
+
+![alt text](readme-assets/image.png)
+![alt text](<readme-assets/Kapture 2025-10-26 at 20.43.02.gif>)
+
 # Apps SDK Boilerplate
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
